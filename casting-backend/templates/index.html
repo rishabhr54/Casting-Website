@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sand Casting Design System</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Sand Casting Pattern & Riser Design</h1>
+
+    <form id="castingForm">
+        <input type="number" id="length" placeholder="Length (mm)" required><br>
+        <input type="number" id="breadth" placeholder="Breadth (mm)" required><br>
+        <input type="number" id="height" placeholder="Height (mm)" required><br>
+
+        <select id="material">
+            <option value="Steel">Steel</option>
+            <option value="CI">Cast Iron</option>
+            <option value="Aluminium">Aluminium</option>
+        </select><br>
+
+        <button type="submit">Calculate</button>
+    </form>
+
+    <h2>Results:</h2>
+    <pre id="result" class="result-box"></pre>
+
+    <hr>
+
+<h2>Upload STL CAD File</h2>
+
+<form id="stlForm" enctype="multipart/form-data">
+    <input type="file" id="cadfile" accept=".stl" required><br>
+
+    <select id="material2">
+        <option value="Steel">Steel</option>
+        <option value="CI">CI</option>
+        <option value="Aluminium">Aluminium</option>
+    </select><br>
+
+    <button type="submit">Upload & Calculate</button>
+</form>
+
+<div id="stlResult" class="result-box"></div>
+
+
+<script>
+document.getElementById("castingForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const data = {
+        length: parseFloat(document.getElementById("length").value),
+        breadth: parseFloat(document.getElementById("breadth").value),
+        height: parseFloat(document.getElementById("height").value),
+        material: document.getElementById("material").value
+    };
+
+    const response = await fetch("/calculate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+    const text = await response.text();
+    alert("Server Error: " + text);
+    return;
+}
+
+    document.getElementById("result").innerHTML = `
+<h3>Pattern Dimensions (mm)</h3>
+<p>Length: ${result.pattern_dimensions_mm.length}</p>
+<p>Breadth: ${result.pattern_dimensions_mm.breadth}</p>
+<p>Height: ${result.pattern_dimensions_mm.height}</p>
+
+<h3>Casting Details</h3>
+<p>Volume (mm³): ${result.casting_volume_mm3}</p>
+<p>Weight (kg): ${result.casting_weight_kg}</p>
+<p>Modulus (mm): ${result.casting_modulus_mm}</p>
+
+<h3>Riser Design</h3>
+<p>Diameter (mm): ${result.riser.riser_diameter_mm}</p>
+<p>Height (mm): ${result.riser.riser_height_mm}</p>
+
+<h3>Gating System (1:4:4)</h3>
+<p>Pouring Time (sec): ${result.gating.pouring_time_sec}</p>
+<p>Sprue Area (mm²): ${result.gating.sprue_area_mm2}</p>
+<p>Runner Area (mm²): ${result.gating.runner_area_mm2}</p>
+<p>Ingate Area (mm²): ${result.gating.ingate_area_mm2}</p>
+`;
+
+});
+
+document.getElementById("stlForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const file = document.getElementById("cadfile").files[0];
+    const material = document.getElementById("material2").value;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("material", material);
+
+    const response = await fetch("/upload", {
+    method: "POST",
+    body: formData
+});
+
+if (!response.ok) {
+    const text = await response.text();
+    alert("Server Error: " + text);
+    return;
+}
+
+const result = await response.json();
+
+
+    document.getElementById("stlResult").innerHTML = `
+<h3>Extracted CAD Geometry</h3>
+<p>Volume (mm³): ${result.volume_mm3}</p>
+<p>Surface Area (mm²): ${result.surface_area_mm2}</p>
+<p>Modulus (mm): ${result.modulus_mm}</p>
+<p>Weight (kg): ${result.weight_kg}</p>
+
+<h3>Riser Design</h3>
+<p>Diameter (mm): ${result.riser.riser_diameter_mm}</p>
+<p>Height (mm): ${result.riser.riser_height_mm}</p>
+
+<h3>Gating System (1:4:4)</h3>
+<p>Pouring Time (sec): ${result.gating.pouring_time_sec}</p>
+<p>Sprue Area (mm²): ${result.gating.sprue_area_mm2}</p>
+<p>Runner Area (mm²): ${result.gating.runner_area_mm2}</p>
+<p>Ingate Area (mm²): ${result.gating.ingate_area_mm2}</p>
+`;
+
+});
+
+</script>
+
+</body>
+</html>

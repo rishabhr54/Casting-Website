@@ -1,0 +1,32 @@
+body {
+    font-family: Arial;
+    padding: 40px;
+}
+
+input, select, button {
+    margin: 10px 0;
+    padding: 8px;
+}
+.result-box {
+    background-color: #f4f4f4;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 8px;
+}
+.result-box h2 { margin-top: 0; }
+
+h1 {
+    text-align: center;
+    color: #1e3a8a;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+.result-box {
+    background: #f9fafb;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
