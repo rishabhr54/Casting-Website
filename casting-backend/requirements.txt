@@ -1,4 +1,8 @@
 fastapi
 uvicorn
-pydantic
-reportlab
+jinja2
+trimesh
+numpy
+python-multipart
+
+
